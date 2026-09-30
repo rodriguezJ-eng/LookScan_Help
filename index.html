@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LookScan · Catálogo de documentos</title>
+<meta name="description" content="Manuales, guías y formatos de LookScan, la app de gestión financiera y operativa.">
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  ESTRUCTURA DE CARPETAS PARA GITHUB PAGES                    ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║  tu-repositorio/                                             ║
+  ║  ├── index.html        ← ESTE archivo (debe llamarse así)    ║
+  ║  └── archivos/         ← crea esta carpeta junto a index.html║
+  ║      ├── manual-usuario.pdf                                  ║
+  ║      ├── guia-inicio-rapido.pdf                              ║
+  ║      └── ...tus PDFs e imágenes                              ║
+  ║                                                              ║
+  ║  En la base de datos (más abajo) la ruta es RELATIVA:        ║
+  ║      ruta: "archivos/manual-usuario.pdf"                     ║
+  ║  Sin "/" al inicio. Respeta mayúsculas/minúsculas: GitHub    ║
+  ║  distingue "Manual.pdf" de "manual.pdf". Evita espacios y    ║
+  ║  tildes en los nombres de archivo (usa-guiones-asi.pdf).     ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- Colores y tipografías (cámbialos aquí) ---------- */
+  :root {
+    --fondo: #EEF3F5;
+    --tarjeta: #FFFFFF;
+    --tinta: #11273B;        /* texto principal y encabezado */
+    --tinta-suave: #51677A;  /* texto secundario */
+    --linea: #D5DFE5;
+    --acento: #0B7A85;       /* botones y foco */
+    --escaneo: #F2B632;      /* línea de escaneo del encabezado */
+
+    /* Un color por categoría (borde izquierdo de la tarjeta y chip) */
+    --cat-manuales: #0B7A85;
+    --cat-guias: #3B5BDB;
+    --cat-formatos: #B8700B;
+    --cat-otros: #6B7A88;
+
+    --titulos: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--tinta);
+    font-family: var(--texto);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* ---------- Encabezado ---------- */
+  header {
+    position: relative;
+    overflow: hidden;
+    background: var(--tinta);
+    color: #fff;
+    padding: 3rem 1.25rem 3.5rem;
+  }
+  .contenedor { max-width: 1100px; margin: 0 auto; }
+  header h1 {
+    margin: 0 0 .5rem;
+    font-family: var(--titulos);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+  }
+  header p { margin: 0; max-width: 52ch; color: #C3D2DD; font-size: 1.1rem; }
+
+  /* Línea de escaneo: se mueve una sola vez al cargar la página */
+  header::after {
+    content: "";
+    position: absolute; left: 0; right: 0; top: 0;
+    height: 3px;
+    background: var(--escaneo);
+    box-shadow: 0 0 14px 2px rgba(242,182,50,.7);
+    animation: escanear 1.6s ease-out 1 forwards;
+  }
+  @keyframes escanear {
+    from { top: 0; opacity: 1; }
+    to   { top: 100%; opacity: 0; }
+  }
+
+  /* ---------- Controles: búsqueda y categorías ---------- */
+  .controles {
+    max-width: 1100px;
+    margin: -1.6rem auto 0;
+    padding: 0 1.25rem;
+    position: relative;
+  }
+  .panel {
+    background: var(--tarjeta);
+    border: 1px solid var(--linea);
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 8px 24px -12px rgba(17,39,59,.25);
+  }
+  .buscador { display: block; }
+  .buscador input {
+    width: 100%;
+    font: inherit;
+    padding: .8rem 1rem;
+    border: 1.5px solid var(--linea);
+    border-radius: 10px;
+    background: var(--fondo);
+    color: var(--tinta);
+  }
+  .buscador input::placeholder { color: var(--tinta-suave); }
+
+  .categorias { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+  .categorias button {
+    font: inherit; font-weight: 600;
+    padding: .45rem 1rem;
+    border: 1.5px solid var(--linea);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--tinta);
+    cursor: pointer;
+  }
+  .categorias button:hover { border-color: var(--tinta-suave); }
+  .categorias button[aria-pressed="true"] {
+    background: var(--tinta);
+    border-color: var(--tinta);
+    color: #fff;
+  }
+
+  /* Foco visible para quienes navegan con teclado */
+  input:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 3px solid var(--acento);
+    outline-offset: 2px;
+  }
+
+  .contador { margin: 1.25rem 0 .75rem; color: var(--tinta-suave); font-size: .95rem; }
+
+  /* ---------- Cuadrícula de tarjetas ---------- */
+  main { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem 3rem; }
+  .cuadricula {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .tarjeta {
+    --color-cat: var(--cat-otros);
+    display: flex; flex-direction: column;
+    background: var(--tarjeta);
+    border: 1px solid var(--linea);
+    border-left: 6px solid var(--color-cat);
+    border-radius: 6px 14px 14px 6px;
+    padding: 1.1rem 1.1rem 1rem;
+  }
+  .tarjeta[data-cat="Manuales"] { --color-cat: var(--cat-manuales); }
+  .tarjeta[data-cat="Guías"]    { --color-cat: var(--cat-guias); }
+  .tarjeta[data-cat="Formatos"] { --color-cat: var(--cat-formatos); }
+
+  .tarjeta h2 {
+    margin: 0 0 .35rem;
+    font-family: var(--titulos);
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+  .meta { display: flex; flex-wrap: wrap; gap: .5rem .9rem; margin-bottom: .6rem; font-size: .9rem; }
+  .meta .cat { font-weight: 600; color: var(--color-cat); }
+  .meta .tam { color: var(--tinta-suave); }
+  .tarjeta p { margin: 0 0 .8rem; color: var(--tinta-suave); flex: 1; }
+
+  .etiquetas { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1rem; }
+  .etiquetas span {
+    font-size: .8rem; padding: .1rem .55rem;
+    background: var(--fondo); border-radius: 6px; color: var(--tinta-suave);
+  }
+
+  .boton {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: .65rem 1rem;
+    background: var(--acento);
+    color: #fff; font-weight: 600; text-decoration: none;
+    border-radius: 10px;
+  }
+  .boton:hover { background: #09656E; }
+
+  /* ---------- Estado vacío ---------- */
+  .vacio {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--tarjeta);
+    border: 2px dashed var(--linea);
+    border-radius: 14px;
+  }
+  .vacio h2 { margin: 0 0 .4rem; font-family: var(--titulos); }
+  .vacio p { margin: 0 0 1rem; color: var(--tinta-suave); }
+  .vacio button {
+    font: inherit; font-weight: 600; padding: .6rem 1.1rem;
+    border: 1.5px solid var(--acento); color: var(--acento);
+    background: transparent; border-radius: 10px; cursor: pointer;
+  }
+  .oculto { display: none; }
+
+  footer { text-align: center; padding: 1.5rem; color: var(--tinta-suave); font-size: .9rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    header::after { animation: none; opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="contenedor">
+    <h1>Documentos de LookScan</h1>
+    <p>Manuales, guías y formatos para gestionar tus finanzas y operaciones. Busca, filtra y descarga lo que necesites.</p>
+  </div>
+</header>
+
+<div class="controles">
+  <div class="panel">
+    <label class="buscador">
+      <span class="oculto">Buscar documentos</span>
+      <input id="busqueda" type="search" placeholder="Busca por título o etiqueta, por ejemplo: factura" autocomplete="off">
+    </label>
+    <!-- Los botones de categoría se generan solos desde la base de datos -->
+    <div id="categorias" class="categorias" role="group" aria-label="Filtrar por categoría"></div>
+  </div>
+</div>
+
+<main>
+  <p id="contador" class="contador" aria-live="polite"></p>
+  <div id="lista" class="cuadricula"></div>
+
+  <!-- Estado vacío -->
+  <div id="vacio" class="vacio oculto">
+    <h2>No se encontraron archivos</h2>
+    <p>Prueba con otra palabra o elige otra categoría.</p>
+    <button id="limpiar" type="button">Limpiar búsqueda</button>
+  </div>
+</main>
+
+<footer>LookScan · Gestión financiera y operativa</footer>
+
+<script>
+  /* ================================================================
+     BASE DE DATOS SIMULADA  ← AQUÍ AGREGAS, EDITAS O BORRAS ARCHIVOS
+     ----------------------------------------------------------------
+     Cada archivo es un bloque { ... } separado por coma.
+       titulo      : nombre que se muestra en la tarjeta
+       categoria   : "Manuales", "Guías", "Formatos" (o una nueva:
+                     el botón de filtro aparece automáticamente)
+       descripcion : texto breve
+       tamano      : tamaño estimado, por ejemplo "2.4 MB"
+       etiquetas   : palabras extra para que la búsqueda lo encuentre
+       ruta        : ruta RELATIVA dentro de tu repositorio,
+                     por ejemplo "archivos/manual-usuario.pdf"
+
+     Para borrar un archivo: elimina su bloque completo.
+     Importante: el archivo real debe existir en la carpeta
+     "archivos/" (junto a este index.html) con el mismo nombre.
+     ================================================================ */
+  const archivos = [
+    {
+      titulo: "Manual de usuario LookScan",
+      categoria: "Manuales",
+      descripcion: "Recorrido completo por las funciones de la app: escaneo, registro y reportes.",
+      tamano: "2.4 MB",
+      etiquetas: ["usuario", "escaneo", "reportes"],
+      ruta: "archivos/manual-usuario.pdf"
+    },
+    {
+      titulo: "Manual de administración",
+      categoria: "Manuales",
+      descripcion: "Cómo crear usuarios, asignar permisos y configurar la empresa.",
+      tamano: "1.8 MB",
+      etiquetas: ["administrador", "permisos", "configuración"],
+      ruta: "archivos/manual-administracion.pdf"
+    },
+    {
+      titulo: "Guía de inicio rápido",
+      categoria: "Guías",
+      descripcion: "Empieza a usar LookScan en 10 minutos: instalación y primer registro.",
+      tamano: "850 KB",
+      etiquetas: ["instalación", "primeros pasos"],
+      ruta: "archivos/guia-inicio-rapido.pdf"
+    },
+    {
+      titulo: "Guía de control de gastos",
+      categoria: "Guías",
+      descripcion: "Pasos para registrar gastos, clasificarlos y revisar el resumen mensual.",
+      tamano: "1.2 MB",
+      etiquetas: ["gastos", "finanzas", "presupuesto"],
+      ruta: "archivos/guia-control-gastos.pdf"
+    },
+    {
+      titulo: "Formato de registro de facturas",
+      categoria: "Formatos",
+      descripcion: "Plantilla para anotar facturas antes de cargarlas en el sistema.",
+      tamano: "320 KB",
+      etiquetas: ["factura", "plantilla", "contabilidad"],
+      ruta: "archivos/formato-facturas.pdf"
+    },
+    {
+      titulo: "Formato de inventario",
+      categoria: "Formatos",
+      descripcion: "Hoja imprimible para el conteo físico de productos y existencias.",
+      tamano: "410 KB",
+      etiquetas: ["inventario", "operaciones", "conteo"],
+      ruta: "archivos/formato-inventario.pdf"
+    }
+  ];
+  /* ============== FIN DE LA BASE DE DATOS ============== */
+
+
+  /* ---------- Lógica de la página (no necesitas editar esto) ---------- */
+  const $lista = document.getElementById("lista");
+  const $vacio = document.getElementById("vacio");
+  const $contador = document.getElementById("contador");
+  const $busqueda = document.getElementById("busqueda");
+  const $categorias = document.getElementById("categorias");
+
+  let categoriaActiva = "Todos";
+
+  // Quita tildes y pasa a minúsculas: "Guía" coincide con "guia"
+  const normalizar = t => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  // Evita que texto con símbolos rompa el HTML
+  const limpiar = t => String(t).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // Crea los botones: "Todos" + las categorías que existan en los datos
+  function crearCategorias() {
+    const nombres = ["Todos", ...new Set(archivos.map(a => a.categoria))];
+    $categorias.innerHTML = nombres.map(n =>
+      `<button type="button" data-cat="${limpiar(n)}" aria-pressed="${n === categoriaActiva}">${limpiar(n)}</button>`
+    ).join("");
+  }
+
+  // Filtra por categoría y por texto (título o etiquetas)
+  function filtrar() {
+    const q = normalizar($busqueda.value.trim());
+    return archivos.filter(a => {
+      const coincideCat = categoriaActiva === "Todos" || a.categoria === categoriaActiva;
+      const texto = normalizar(a.titulo + " " + (a.etiquetas || []).join(" "));
+      return coincideCat && texto.includes(q);
+    });
+  }
+
+  function mostrar() {
+    const resultado = filtrar();
+    $vacio.classList.toggle("oculto", resultado.length > 0);
+    $lista.classList.toggle("oculto", resultado.length === 0);
+    $contador.textContent = resultado.length === 1
+      ? "1 archivo encontrado"
+      : resultado.length + " archivos encontrados";
+
+    $lista.innerHTML = resultado.map(a => `
+      <article class="tarjeta" data-cat="${limpiar(a.categoria)}">
+        <h2>${limpiar(a.titulo)}</h2>
+        <div class="meta">
+          <span class="cat">${limpiar(a.categoria)}</span>
+          <span class="tam">${limpiar(a.tamano)}</span>
+        </div>
+        <p>${limpiar(a.descripcion)}</p>
+        <div class="etiquetas">${(a.etiquetas || []).map(e => `<span>${limpiar(e)}</span>`).join("")}</div>
+        <a class="boton" href="${encodeURI(a.ruta)}" target="_blank" rel="noopener">Ver / Descargar</a>
+      </article>
+    `).join("");
+  }
+
+  // Eventos
+  $busqueda.addEventListener("input", mostrar);
+
+  $categorias.addEventListener("click", e => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    categoriaActiva = btn.dataset.cat;
+    crearCategorias();
+    mostrar();
+  });
+
+  document.getElementById("limpiar").addEventListener("click", () => {
+    $busqueda.value = "";
+    categoriaActiva = "Todos";
+    crearCategorias();
+    mostrar();
+    $busqueda.focus();
+  });
+
+  // Inicio
+  crearCategorias();
+  mostrar();
+</script>
+</body>
+</html>
